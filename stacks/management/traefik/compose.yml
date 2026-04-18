@@ -1,0 +1,107 @@
+services:
+  traefik:
+    image: traefik:v3.4
+    container_name: traefik
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      TZ: ${TZ}
+
+      # ----------------------------
+      # Cloudflare DNS challenge (optional)
+      # Uncomment if using the Cloudflare DNS challenge resolver.
+      # ----------------------------
+      # CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
+      # CF_ZONE_API_TOKEN: ${CF_ZONE_API_TOKEN}
+
+    command:
+      # ----------------------------
+      # Core
+      # ----------------------------
+      - --global.checknewversion=true
+      - --global.sendanonymoususage=false
+
+      # ----------------------------
+      # API / Dashboard
+      # ----------------------------
+      - --api.dashboard=true
+      - --api.insecure=false
+
+      # ----------------------------
+      # Providers
+      # ----------------------------
+      - --providers.docker=true
+      - --providers.docker.endpoint=unix:///var/run/docker.sock
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=${PROXY_NETWORK}
+
+      # ----------------------------
+      # EntryPoints
+      # ----------------------------
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+
+      # ----------------------------
+      # Certificates Resolver (optional)
+      # Choose ONE challenge method below.
+      # ----------------------------
+
+      # HTTP challenge
+      # - --certificatesresolvers.${TRAEFIK_CERTRESOLVER}.acme.email=${ACME_EMAIL}
+      # - --certificatesresolvers.${TRAEFIK_CERTRESOLVER}.acme.storage=/letsencrypt/acme.json
+      # - --certificatesresolvers.${TRAEFIK_CERTRESOLVER}.acme.httpchallenge=true
+      # - --certificatesresolvers.${TRAEFIK_CERTRESOLVER}.acme.httpchallenge.entrypoint=web
+
+      # Cloudflare DNS challenge
+      # - --certificatesresolvers.${TRAEFIK_CERTRESOLVER}.acme.email=${ACME_EMAIL}
+      # - --certificatesresolvers.${TRAEFIK_CERTRESOLVER}.acme.storage=/letsencrypt/acme.json
+      # - --certificatesresolvers.${TRAEFIK_CERTRESOLVER}.acme.dnschallenge=true
+      # - --certificatesresolvers.${TRAEFIK_CERTRESOLVER}.acme.dnschallenge.provider=cloudflare
+
+      # Optional: logs
+      # - --log.level=INFO
+      # - --accesslog=true
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${CONFIG_ROOT}/traefik:/etc/traefik
+      - ${DATA_ROOT}/traefik/letsencrypt:/letsencrypt
+
+    networks:
+      - shared
+      - proxy
+
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN}`)
+      - traefik.http.routers.traefik.entrypoints=websecure
+      - traefik.http.routers.traefik.tls=true
+
+      # Optional: enable resolver on dashboard router
+      # - traefik.http.routers.traefik.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+
+      - traefik.http.routers.traefik.service=api@internal
+
+      # Optional: basic auth middleware
+      # - traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH}
+      # - traefik.http.routers.traefik.middlewares=traefik-auth
+
+      # Optional: Watchtower
+      # - com.centurylinklabs.watchtower.enable=true
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
