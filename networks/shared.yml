@@ -1,0 +1,4 @@
+networks:
+  shared:
+    name: ${SHARED_NETWORK}
+    driver: bridge
