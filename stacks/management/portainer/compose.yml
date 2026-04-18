@@ -1,0 +1,64 @@
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      TZ: ${TZ}
+
+    command: -H unix:///var/run/docker.sock
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${CONFIG_ROOT}/portainer:/data
+
+    ports:
+      - "${PORTAINER_PORT}:9443"
+      # Optional: Edge tunnel server
+      # - "${PORTAINER_EDGE_PORT}:8000"
+
+    networks:
+      - shared
+      - proxy
+
+    # ----------------------------
+    # 🔀 Labels (optional)
+    # Uncomment and merge as needed.
+    # ----------------------------
+    # labels:
+    #   # Traefik
+    #   - traefik.enable=true
+    #   - traefik.http.routers.portainer.rule=Host(`${PORTAINER_DOMAIN}`)
+    #   - traefik.http.routers.portainer.entrypoints=websecure
+    #   - traefik.http.routers.portainer.tls=true
+    #   - traefik.http.routers.portainer.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.portainer.loadbalancer.server.port=9443
+    #
+    #   # If Traefik should talk HTTPS to Portainer internally:
+    #   # - traefik.http.services.portainer.loadbalancer.server.scheme=https
+    #
+    #   # Watchtower
+    #   - com.centurylinklabs.watchtower.enable=true
+
+    # ----------------------------
+    # 🧪 Optional healthcheck
+    # Replace with a real service-specific check if desired.
+    # ----------------------------
+    # healthcheck:
+    #   test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider https://127.0.0.1:9443/ || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 30s
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
