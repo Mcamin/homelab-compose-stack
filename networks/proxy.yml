@@ -1,0 +1,4 @@
+networks:
+  proxy:
+    name: ${PROXY_NETWORK}
+    driver: bridge
