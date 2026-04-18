@@ -1,0 +1,64 @@
+services:
+  app:
+    image: your-image:stable
+    container_name: your-app
+    restart: unless-stopped
+
+    env_file:
+      - ../../.env
+
+    environment:
+      TZ: ${TZ}
+
+    volumes:
+      - ${CONFIG_ROOT}/your-app:/config
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    networks:
+      - shared
+      - internal
+
+    # Optional example healthcheck
+    # healthcheck:
+    #   test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:1234/ || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 20s
+
+  db:
+    image: postgres:16
+    container_name: your-db
+    restart: unless-stopped
+
+    env_file:
+      - ../../.env
+
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: change-me
+
+    volumes:
+      - ${DATA_ROOT}/your-app-db:/var/lib/postgresql/data
+
+    networks:
+      - internal
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  internal:
+    driver: bridge
+    internal: true
