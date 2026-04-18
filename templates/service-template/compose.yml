@@ -1,0 +1,39 @@
+services:
+  app:
+    image: your-image:stable
+    container_name: your-app
+    restart: unless-stopped
+
+    env_file:
+      - ../../.env
+
+    environment:
+      TZ: ${TZ}
+      PUID: ${PUID}
+      PGID: ${PGID}
+
+    volumes:
+      - ${CONFIG_ROOT}/your-app:/config
+
+    ports:
+      - "1234:1234"
+
+    networks:
+      - shared
+      - proxy
+
+    # Optional: replace with a real service-specific healthcheck
+    # healthcheck:
+    #   test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:1234/ || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 20s
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
