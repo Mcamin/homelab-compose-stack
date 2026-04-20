@@ -1,0 +1,48 @@
+services:
+  searxng:
+    image: docker.io/searxng/searxng:latest
+    container_name: searxng
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      TZ: ${TZ}
+      SEARXNG_BASE_URL: ${SEARXNG_BASE_URL}
+      UWSGI_WORKERS: ${SEARXNG_UWSGI_WORKERS}
+      UWSGI_THREADS: ${SEARXNG_UWSGI_THREADS}
+    volumes:
+      - ${CONFIG_ROOT}/searxng:/etc/searxng
+
+    ports:
+      - "${SEARXNG_PORT}:8080"
+
+    networks:
+      - shared
+      - proxy
+
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.searxng.rule=Host(`${SEARXNG_DOMAIN}`)
+    #   - traefik.http.routers.searxng.entrypoints=websecure
+    #   - traefik.http.routers.searxng.tls=true
+    #   - traefik.http.routers.searxng.tls.certresolver=${TRAEFIK_CERTRESOLVER} # Must match Traefik config
+    #   - traefik.http.services.searxng.loadbalancer.server.port=8080
+    #
+    #   - com.centurylinklabs.watchtower.enable=true
+
+    # healthcheck:
+    #   test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:8080/ || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 30s
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
