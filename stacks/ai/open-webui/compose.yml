@@ -1,0 +1,67 @@
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      TZ: ${TZ}
+      WEBUI_SECRET_KEY: ${OPEN_WEBUI_SECRET_KEY}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL}
+
+      # Optional OpenAI-compatible API endpoint
+      # OPENAI_API_BASE_URL: ${OPENAI_API_BASE_URL}
+
+      # Optional image generation support
+      # ENABLE_IMAGE_GENERATION: ${ENABLE_IMAGE_GENERATION}
+      # IMAGE_GENERATION_ENGINE: ${IMAGE_GENERATION_ENGINE}
+      # IMAGE_GENERATION_MODEL: ${IMAGE_GENERATION_MODEL}
+      # IMAGE_SIZE: ${IMAGE_SIZE}
+
+      # Optional: RAG / Web search integration (SearXNG)
+      # ENABLE_RAG_WEB_SEARCH: ${ENABLE_RAG_WEB_SEARCH}
+      # RAG_WEB_SEARCH_ENGINE: ${RAG_WEB_SEARCH_ENGINE}
+      # RAG_WEB_SEARCH_RESULT_COUNT: ${RAG_WEB_SEARCH_RESULT_COUNT}
+      # RAG_WEB_SEARCH_CONCURRENT_REQUESTS: ${RAG_WEB_SEARCH_CONCURRENT_REQUESTS}
+      # SEARXNG_QUERY_URL: ${SEARXNG_QUERY_URL}
+
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+    volumes:
+      - ${CONFIG_ROOT}/open-webui:/app/backend/data
+
+    ports:
+      - "${OPEN_WEBUI_PORT}:8080"
+
+    networks:
+      - shared
+      - proxy
+
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.open-webui.rule=Host(`${OPEN_WEBUI_DOMAIN}`)
+    #   - traefik.http.routers.open-webui.entrypoints=websecure
+    #   - traefik.http.routers.open-webui.tls=true
+    #   - traefik.http.routers.open-webui.tls.certresolver=${TRAEFIK_CERTRESOLVER} # Must match Traefik config
+    #   - traefik.http.services.open-webui.loadbalancer.server.port=8080
+    #
+    #   - com.centurylinklabs.watchtower.enable=true
+
+    # healthcheck:
+    #   test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:8080/health || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 30s
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
