@@ -26,7 +26,7 @@ services:
       - proxy
 
     # ----------------------------
-    # 🔀 Labels (optional)
+    # Labels (optional)
     # Uncomment and merge as needed.
     # ----------------------------
     # labels:
@@ -45,7 +45,7 @@ services:
     #   - com.centurylinklabs.watchtower.enable=true
 
     # ----------------------------
-    # 🧪 Optional healthcheck
+    # Optional healthcheck
     # Replace with a real service-specific check if desired.
     # ----------------------------
     # healthcheck:

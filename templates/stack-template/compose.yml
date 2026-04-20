@@ -28,7 +28,7 @@ services:
       - internal
 
     # ----------------------------
-    # 🔀 Labels (optional)
+    # Labels (optional)
     # Uncomment and merge as needed.
     # ----------------------------
     # labels:
@@ -46,7 +46,7 @@ services:
     #   # - com.centurylinklabs.watchtower.scope=${WATCHTOWER_SCOPE}
 
     # ----------------------------
-    # 🧪 Optional healthcheck
+    # Optional healthcheck
     # Replace with a real service-specific check.
     # ----------------------------
     # healthcheck:
@@ -83,7 +83,7 @@ services:
       start_period: 20s
 
     # ----------------------------
-    # 🔄 Watchtower (optional)
+    # Watchtower (optional)
     # ----------------------------
     # labels:
     #   - com.centurylinklabs.watchtower.enable=true
