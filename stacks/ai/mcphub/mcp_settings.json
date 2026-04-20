@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "time": {
+      "command": "npx",
+      "args": ["-y", "time-mcp"]
+    },
+    "fetch": {
+      "command": "uvx",
+      "args": ["mcp-server-fetch"]
+    },
+    "notion": {
+      "url": "https://mcp.notion.com/mcp",
+      "type": "streamable-http",
+      "oauth": {
+        "redirectUri": "https://mcphub.example.com/oauth/callback"
+      }
+    }
+  }
+}
