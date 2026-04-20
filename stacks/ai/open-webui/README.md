@@ -122,12 +122,41 @@ Auto-update support is available via label:
 ```yaml
 # - com.centurylinklabs.watchtower.enable=true
 ```
+---
+## Companion Stacks
+
+This stack is designed to integrate cleanly with other AI services in this repository.
+
+### Recommended pairings
+
+- `stacks/ai/ollama` for local model inference
+- `stacks/ai/searxng` for optional web search in RAG workflows
+
+### Reference flow
+
+```text
+User -> Open WebUI -> Ollama
+                  -> SearXNG
+````
+
+### Example related configuration
+
+```env
+OLLAMA_BASE_URL=http://ollama:11434
+ENABLE_RAG_WEB_SEARCH=true
+RAG_WEB_SEARCH_ENGINE=searxng
+SEARXNG_QUERY_URL=http://searxng:8080/search
+```
+
+### Notes
+
+* The hostnames `ollama` and `searxng` assume matching service names or network aliases
+* All services must share a common Docker network such as `shared`
+* This stack can run standalone, but it is most useful when paired with one or both companion stacks
 
 ---
-
 ## References
 
 * [https://github.com/open-webui/open-webui](https://github.com/open-webui/open-webui)
 * [https://docs.openwebui.com/](https://docs.openwebui.com/)
 
-```
