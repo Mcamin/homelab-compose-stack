@@ -1,0 +1,61 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      TZ: ${TZ}
+      OLLAMA_HOST: ${OLLAMA_HOST}
+      OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE}
+      OLLAMA_MAX_LOADED_MODELS: ${OLLAMA_MAX_LOADED_MODELS}
+
+    volumes:
+      - ${DATA_ROOT}/ollama:/root/.ollama
+
+    ports:
+      - "${OLLAMA_PORT}:11434"
+
+    networks:
+      - shared
+      - proxy
+
+    # Optional: NVIDIA GPU support
+    # Requires NVIDIA Container Toolkit on the host.
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.ollama.rule=Host(`${OLLAMA_DOMAIN}`)
+    #   - traefik.http.routers.ollama.entrypoints=websecure
+    #   - traefik.http.routers.ollama.tls=true
+    #   - traefik.http.routers.ollama.tls.certresolver=${TRAEFIK_CERTRESOLVER} # Must match Traefik config
+    #   - traefik.http.services.ollama.loadbalancer.server.port=11434
+    #
+    #   - com.centurylinklabs.watchtower.enable=true
+
+    # Optional healthcheck
+    # The official image may not include curl/wget in all versions, so keep this commented unless confirmed.
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:11434/api/version || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+    #   start_period: 30s
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}

@@ -22,3 +22,25 @@ All configuration is defined in the root `.env` file.
 
 ```env
 SEARXNG_BASE_URL=http://searxng:8080
+```
+---
+
+## Companion Stacks
+
+SearXNG is intended to work with:
+
+- `stacks/ai/open-webui` for optional RAG / web search integration
+
+### Example integration
+
+```env
+ENABLE_RAG_WEB_SEARCH=true
+RAG_WEB_SEARCH_ENGINE=searxng
+SEARXNG_QUERY_URL=http://searxng:8080/search
+```
+
+### Notes
+
+* The hostname `searxng` assumes the container is reachable by service name on the shared network
+* Open WebUI and SearXNG must share a common Docker network such as `shared`
+
