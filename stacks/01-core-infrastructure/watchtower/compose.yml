@@ -1,0 +1,29 @@
+services:
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      TZ: ${TZ}
+      # Only update containers that opt in with the label
+      #   com.centurylinklabs.watchtower.enable=true
+      # (every stack in this repo ships that label commented out).
+      WATCHTOWER_LABEL_ENABLE: "true"
+      # When to check for updates (6-field cron). Default: 04:00 daily.
+      WATCHTOWER_SCHEDULE: ${WATCHTOWER_SCHEDULE:-0 0 4 * * *}
+      # Remove old images after updating.
+      WATCHTOWER_CLEANUP: "true"
+
+      # ----------------------------
+      # Optional notifications (shoutrrr). Uncomment + set WATCHTOWER_NOTIFICATION_URL.
+      # ntfy example: ntfy://ntfy.local.example.com/watchtower
+      # ----------------------------
+      # WATCHTOWER_NOTIFICATIONS: shoutrrr
+      # WATCHTOWER_NOTIFICATION_URL: ${WATCHTOWER_NOTIFICATION_URL}
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
