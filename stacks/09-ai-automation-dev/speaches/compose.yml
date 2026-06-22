@@ -1,0 +1,43 @@
+services:
+  speaches:
+    image: ghcr.io/speaches-ai/speaches:latest
+    container_name: speaches
+    restart: unless-stopped
+    env_file:
+      - ../../../.env
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - ${DATA_ROOT}/speaches/hf-cache:/home/ubuntu/.cache/huggingface/hub
+    ports:
+      - "${SPEACHES_PORT:-8000}:8000"
+    networks:
+      - shared
+      - proxy
+    # ----------------------------
+    # NVIDIA GPU (optional). Needs the nvidia-container-toolkit on the host.
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    # ----------------------------
+    # For GPU use the image tag, e.g. ghcr.io/speaches-ai/speaches:latest-cuda
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.speaches.rule=Host(`${SPEACHES_DOMAIN}`)
+    #   - traefik.http.routers.speaches.entrypoints=websecure
+    #   - traefik.http.routers.speaches.tls=true
+    #   - traefik.http.routers.speaches.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.speaches.loadbalancer.server.port=8000
+    #
+    #   - diun.enable=true
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
