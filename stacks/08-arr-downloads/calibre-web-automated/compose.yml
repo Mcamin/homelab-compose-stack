@@ -1,0 +1,26 @@
+services:
+  calibre-web-automated:
+    image: crocodilestick/calibre-web-automated:latest
+    container_name: calibre-web-automated
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+
+    volumes:
+      - ${CONFIG_ROOT}/calibre-web-automated:/config
+      - ${MEDIA_ROOT}/books/calibre-library:/calibre-library
+      - ${CONFIG_ROOT}/cwa/ingest:/cwa-book-ingest
+
+    # VPN routing via the gluetun stack (start gluetun first; UI port is
+    # published on the gluetun stack; comment network_mode to skip the VPN;
+    # restart this container if gluetun is recreated).
+    network_mode: "container:gluetun"
+
+    # labels:
+    #   - diun.enable=true
