@@ -1,0 +1,31 @@
+services:
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+
+    volumes:
+      - ${CONFIG_ROOT}/sonarr:/config
+      - ${MEDIA_ROOT}/tv:/tv
+      - ${DOWNLOADS_ROOT}:/downloads
+
+    # ----------------------------------------------------------------
+    # VPN routing via the gluetun stack (08-arr-downloads/gluetun).
+    # - Start gluetun FIRST; this won't start without it.
+    # - This service's web UI is published on the GLUETUN stack, not here.
+    # - To run WITHOUT the VPN: comment network_mode and add your own
+    #   ports: + networks: (shared/proxy) instead.
+    # - If gluetun is recreated, restart this container.
+    # ----------------------------------------------------------------
+    network_mode: "container:gluetun"
+
+    # labels:
+    #   - diun.enable=true   # opt in to Diun update notifications
