@@ -1,0 +1,24 @@
+services:
+  openbooks:
+    image: evanbuss/openbooks:latest
+    container_name: openbooks
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      TZ: ${TZ}
+
+    volumes:
+      - ${MEDIA_ROOT}/books:/books
+
+    command: --persist --name ${OPENBOOKS_NAME:-homelab}
+
+    # VPN routing via the gluetun stack (start gluetun first; UI port is
+    # published on the gluetun stack; comment network_mode to skip the VPN;
+    # restart this container if gluetun is recreated).
+    network_mode: "container:gluetun"
+
+    # labels:
+    #   - diun.enable=true
