@@ -1,0 +1,46 @@
+services:
+  comfyui:
+    # No single "official" ComfyUI image — this mirrors the homelab setup. Popular
+    # alternatives: ghcr.io/ai-dock/comfyui, yanwk/comfyui-boot.
+    image: ${COMFYUI_IMAGE:-madtomy/comfy-ui:latest}
+    container_name: comfyui
+    restart: unless-stopped
+    env_file:
+      - ../../../.env
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - ${DATA_ROOT}/comfyui/data:/data
+      - ${DATA_ROOT}/comfyui/models:/app/models
+    ports:
+      - "${COMFYUI_PORT:-8188}:8188"
+    networks:
+      - shared
+      - proxy
+    # ----------------------------
+    # NVIDIA GPU (optional). Needs the nvidia-container-toolkit on the host.
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    # ----------------------------
+    # ComfyUI is effectively GPU-only for real use — uncomment the GPU block above.
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.comfyui.rule=Host(`${COMFYUI_DOMAIN}`)
+    #   - traefik.http.routers.comfyui.entrypoints=websecure
+    #   - traefik.http.routers.comfyui.tls=true
+    #   - traefik.http.routers.comfyui.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.comfyui.loadbalancer.server.port=8188
+    #
+    #   - diun.enable=true
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
