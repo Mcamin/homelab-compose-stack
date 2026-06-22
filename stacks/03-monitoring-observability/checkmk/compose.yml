@@ -1,0 +1,38 @@
+services:
+  checkmk:
+    image: checkmk/check-mk-raw:latest
+    container_name: checkmk
+    restart: unless-stopped
+    env_file:
+      - ../../../.env
+    environment:
+      TZ: ${TZ}
+      CMK_PASSWORD: ${CMK_PASSWORD}
+      CMK_SITE_ID: ${CMK_SITE_ID:-cmk}
+    tmpfs:
+      - /opt/omd/sites/cmk/tmp:uid=1000,gid=1000
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${DATA_ROOT}/checkmk:/omd/sites
+    ports:
+      - "${CHECKMK_PORT:-8080}:5000"   # web UI -> http://<host>:PORT/cmk/
+      - "162:162/udp"                  # SNMP traps (optional)
+    networks:
+      - shared
+      - proxy
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.checkmk.rule=Host(`${CHECKMK_DOMAIN}`)
+    #   - traefik.http.routers.checkmk.entrypoints=websecure
+    #   - traefik.http.routers.checkmk.tls=true
+    #   - traefik.http.routers.checkmk.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.checkmk.loadbalancer.server.port=5000
+    #
+    #   - diun.enable=true
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
