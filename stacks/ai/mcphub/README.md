@@ -10,7 +10,7 @@ This stack provides a Docker Compose deployment for MCPHub with:
 - mounted MCP server configuration
 - centralized environment-driven configuration
 - optional Traefik integration
-- optional Watchtower updates
+- optional Diun/Tugtainer updates
 
 ## Configuration
 
@@ -94,12 +94,12 @@ To enable:
 * configure `MCPHUB_DOMAIN`
 * ensure Traefik is running
 
-### Watchtower
+### Diun/Tugtainer
 
 Auto-update support is available via label:
 
 ```yaml
-# - com.centurylinklabs.watchtower.enable=true
+# - diun.enable=true
 ```
 
 ## Notes

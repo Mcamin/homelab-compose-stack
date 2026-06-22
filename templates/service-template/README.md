@@ -17,7 +17,7 @@ It is designed to keep:
 - shared environment loading via `env_file`
 - reusable `shared` and `proxy` networks
 - optional Traefik labels
-- optional Watchtower label
+- optional Diun/Tugtainer label
 - optional healthcheck block
 
 ## Conventions

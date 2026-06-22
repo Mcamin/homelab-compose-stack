@@ -31,7 +31,10 @@ services:
     #   - traefik.http.routers.grafana.tls.certresolver=${TRAEFIK_CERTRESOLVER}
     #   - traefik.http.services.grafana.loadbalancer.server.port=3000
     #
-    #   - com.centurylinklabs.watchtower.enable=true
+    #   # Diun (image-update notifications) - opt in:
+    #   - diun.enable=true
+    #   # Tugtainer - uncomment to EXCLUDE this container from auto-updates:
+    #   # - dev.quenary.tugtainer.protected=true
 
 networks:
   shared:

@@ -33,7 +33,10 @@ services:
     #   - traefik.http.routers.homarr.tls.certresolver=${TRAEFIK_CERTRESOLVER}
     #   - traefik.http.services.homarr.loadbalancer.server.port=7575
     #
-    #   - com.centurylinklabs.watchtower.enable=true
+    #   # Diun (image-update notifications) - opt in:
+    #   - diun.enable=true
+    #   # Tugtainer - uncomment to EXCLUDE this container from auto-updates:
+    #   # - dev.quenary.tugtainer.protected=true
 
 networks:
   shared:

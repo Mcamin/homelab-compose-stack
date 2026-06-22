@@ -41,7 +41,10 @@ services:
     #   - traefik.http.routers.ollama.tls.certresolver=${TRAEFIK_CERTRESOLVER} # Must match Traefik config
     #   - traefik.http.services.ollama.loadbalancer.server.port=11434
     #
-    #   - com.centurylinklabs.watchtower.enable=true
+    #   # Diun (image-update notifications) - opt in:
+    #   - diun.enable=true
+    #   # Tugtainer - uncomment to EXCLUDE this container from auto-updates:
+    #   # - dev.quenary.tugtainer.protected=true
 
     # Optional healthcheck
     # The official image may not include curl/wget in all versions, so keep this commented unless confirmed.

@@ -39,7 +39,10 @@ services:
     #   - traefik.http.routers.adguard.tls.certresolver=${TRAEFIK_CERTRESOLVER}
     #   - traefik.http.services.adguard.loadbalancer.server.port=80
     #
-    #   - com.centurylinklabs.watchtower.enable=true
+    #   # Diun (image-update notifications) - opt in:
+    #   - diun.enable=true
+    #   # Tugtainer - uncomment to EXCLUDE this container from auto-updates:
+    #   # - dev.quenary.tugtainer.protected=true
 
     # ----------------------------
     # Optional healthcheck

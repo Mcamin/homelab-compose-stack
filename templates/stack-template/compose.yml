@@ -40,10 +40,10 @@ services:
     #   - traefik.http.routers.app.tls.certresolver=${TRAEFIK_CERTRESOLVER}
     #   - traefik.http.services.app.loadbalancer.server.port=1234
     #
-    #   # Watchtower
-    #   - com.centurylinklabs.watchtower.enable=true
-    #   # Optional scoped Watchtower usage
-    #   # - com.centurylinklabs.watchtower.scope=${WATCHTOWER_SCOPE}
+    #   # Diun (image-update notifications) - opt in:
+    #   - diun.enable=true
+    #   # Tugtainer - uncomment to EXCLUDE this container from auto-updates:
+    #   # - dev.quenary.tugtainer.protected=true
 
     # ----------------------------
     # Optional healthcheck
@@ -83,12 +83,12 @@ services:
       start_period: 20s
 
     # ----------------------------
-    # Watchtower (optional)
     # ----------------------------
     # labels:
-    #   - com.centurylinklabs.watchtower.enable=true
-    #   # Optional scoped Watchtower usage
-    #   # - com.centurylinklabs.watchtower.scope=${WATCHTOWER_SCOPE}
+    #   # Diun (image-update notifications) - opt in:
+    #   - diun.enable=true
+    #   # Tugtainer - uncomment to EXCLUDE this container from auto-updates:
+    #   # - dev.quenary.tugtainer.protected=true
 
 networks:
   shared:

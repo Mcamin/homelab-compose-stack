@@ -9,7 +9,7 @@ This stack provides a clean Docker Compose deployment for Portainer with:
 - persistent application data
 - Docker socket access for local container management
 - optional Traefik labels
-- optional Watchtower update label
+- optional Diun/Tugtainer update label
 - reusable shared networking
 
 ## Notes

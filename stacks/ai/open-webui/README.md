@@ -9,7 +9,7 @@ This stack provides a Docker Compose deployment for Open WebUI with:
 - persistent application data
 - centralized environment-driven configuration
 - optional Traefik integration
-- optional Watchtower updates
+- optional Diun/Tugtainer updates
 - support for local (Ollama) and external API backends
 - optional RAG (retrieval-augmented generation) via web search
 
@@ -115,12 +115,12 @@ To enable:
 
 ---
 
-### Watchtower
+### Diun/Tugtainer
 
 Auto-update support is available via label:
 
 ```yaml
-# - com.centurylinklabs.watchtower.enable=true
+# - diun.enable=true
 ```
 ---
 ## Companion Stacks

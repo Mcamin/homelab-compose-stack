@@ -1,6 +1,6 @@
 # ntfy
 
-Simple pub/sub push notifications (great target for Watchtower, backups, alerts, etc.).
+Simple pub/sub push notifications (great target for Diun/Tugtainer, backups, alerts, etc.).
 
 ## Setup
 - Put server config in `${CONFIG_ROOT}/ntfy/server.yml` (e.g. `base-url`, auth). The

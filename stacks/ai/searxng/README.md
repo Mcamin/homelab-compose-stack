@@ -9,7 +9,7 @@ This stack provides a Docker Compose deployment for SearXNG with:
 - persistent configuration
 - centralized environment-driven setup
 - optional Traefik integration
-- optional Watchtower updates
+- optional Diun/Tugtainer updates
 - compatibility with Open WebUI RAG workflows
 
 ---

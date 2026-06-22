@@ -30,7 +30,10 @@ services:
     #   - traefik.http.routers.mcphub.tls.certresolver=${TRAEFIK_CERTRESOLVER} # Must match Traefik config
     #   - traefik.http.services.mcphub.loadbalancer.server.port=3000
     #
-    #   - com.centurylinklabs.watchtower.enable=true
+    #   # Diun (image-update notifications) - opt in:
+    #   - diun.enable=true
+    #   # Tugtainer - uncomment to EXCLUDE this container from auto-updates:
+    #   # - dev.quenary.tugtainer.protected=true
 
     # healthcheck:
     #   test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/ || exit 1"]

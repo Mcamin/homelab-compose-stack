@@ -9,7 +9,7 @@ This stack provides a Docker Compose deployment for Ollama with:
 - persistent model storage
 - centralized environment-driven configuration
 - optional Traefik integration
-- optional Watchtower updates
+- optional Diun/Tugtainer updates
 - optional NVIDIA GPU support
 
 ## Configuration
@@ -65,12 +65,12 @@ To enable:
 * configure `OLLAMA_DOMAIN`
 * ensure Traefik is running
 
-### Watchtower
+### Diun/Tugtainer
 
 Auto-update support is available via label:
 
 ```yaml
-# - com.centurylinklabs.watchtower.enable=true
+# - diun.enable=true
 ```
 
 ### NVIDIA GPU Support

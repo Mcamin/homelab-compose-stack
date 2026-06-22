@@ -41,8 +41,10 @@ services:
     #   # If Traefik should talk HTTPS to Portainer internally:
     #   # - traefik.http.services.portainer.loadbalancer.server.scheme=https
     #
-    #   # Watchtower
-    #   - com.centurylinklabs.watchtower.enable=true
+    #   # Diun (image-update notifications) - opt in:
+    #   - diun.enable=true
+    #   # Tugtainer - uncomment to EXCLUDE this container from auto-updates:
+    #   # - dev.quenary.tugtainer.protected=true
 
     # ----------------------------
     # Optional healthcheck

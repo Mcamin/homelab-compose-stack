@@ -17,7 +17,7 @@ Use this template for setups such as:
 - reusable `shared`, `proxy`, and `internal` networks
 - `depends_on` with `service_healthy`
 - optional Traefik labels
-- optional Watchtower labels
+- optional Diun/Tugtainer labels
 - optional app healthcheck
 - built-in database healthcheck example
 
@@ -40,4 +40,3 @@ Use this template for setups such as:
 
 - `depends_on: condition: service_healthy` is useful when an app should wait until a dependency is actually ready
 - Keep proxy labels commented unless the service is exposed through Traefik
-- Use scoped Watchtower labels only if your Watchtower instance is configured for scoped updates
