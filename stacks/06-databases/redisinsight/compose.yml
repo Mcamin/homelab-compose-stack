@@ -1,0 +1,35 @@
+services:
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
+    restart: unless-stopped
+    env_file:
+      - ../../../.env
+    environment:
+      TZ: ${TZ}
+      RI_ENCRYPTION_KEY: ${REDISINSIGHT_ENCRYPTION_KEY}
+    volumes:
+      - ${DATA_ROOT}/redisinsight:/data
+    ports:
+      - "${REDISINSIGHT_PORT:-5540}:5540"
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - shared
+      - proxy
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.redisinsight.rule=Host(`${REDISINSIGHT_DOMAIN}`)
+    #   - traefik.http.routers.redisinsight.entrypoints=websecure
+    #   - traefik.http.routers.redisinsight.tls=true
+    #   - traefik.http.routers.redisinsight.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.redisinsight.loadbalancer.server.port=5540
+    #
+    #   - diun.enable=true
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
