@@ -1,0 +1,74 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    user: root
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      TZ: ${TZ}
+
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ${DATA_ROOT}/prometheus:/prometheus
+
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+
+    networks:
+      - shared
+      - proxy
+      - internal
+
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.prometheus.rule=Host(`${PROMETHEUS_DOMAIN}`)
+    #   - traefik.http.routers.prometheus.entrypoints=websecure
+    #   - traefik.http.routers.prometheus.tls=true
+    #   - traefik.http.routers.prometheus.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.prometheus.loadbalancer.server.port=9090
+
+  node-exporter:
+    image: quay.io/prometheus/node-exporter:v1.8.2
+    container_name: node-exporter
+    restart: unless-stopped
+    command:
+      - --path.rootfs=/host
+    pid: host
+    volumes:
+      - /:/host:ro,rslave
+    networks:
+      - internal
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.51.0
+    container_name: cadvisor
+    restart: unless-stopped
+    privileged: true
+    devices:
+      - /dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+    networks:
+      - internal
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
+  internal:
+    driver: bridge
+    internal: true
