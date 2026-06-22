@@ -1,0 +1,46 @@
+services:
+  nodecast-tv:
+    image: ghcr.io/technomancer702/nodecast-tv:latest
+    container_name: nodecast-tv
+    restart: unless-stopped
+    env_file:
+      - ../../../.env
+    environment:
+      TZ: ${TZ}
+      PUID: ${PUID}
+      PGID: ${PGID}
+      NODE_ENV: production
+      PORT: "3000"
+    volumes:
+      - ${CONFIG_ROOT}/nodecast-tv:/app/data
+    ports:
+      - "${NODECAST_PORT:-3000}:3000"
+    networks:
+      - shared
+      - proxy
+    # ----------------------------
+    # NVIDIA GPU (optional). Needs the nvidia-container-toolkit on the host.
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    # ----------------------------
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.nodecast-tv.rule=Host(`${NODECAST_DOMAIN}`)
+    #   - traefik.http.routers.nodecast-tv.entrypoints=websecure
+    #   - traefik.http.routers.nodecast-tv.tls=true
+    #   - traefik.http.routers.nodecast-tv.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.nodecast-tv.loadbalancer.server.port=3000
+    #
+    #   - diun.enable=true
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
