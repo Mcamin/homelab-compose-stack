@@ -1,0 +1,44 @@
+services:
+  homarr:
+    image: ghcr.io/homarr-labs/homarr:latest
+    container_name: homarr
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      TZ: ${TZ}
+      BASE_URL: https://${HOMARR_DOMAIN}
+      # 64-hex-char key. Generate: openssl rand -hex 32
+      SECRET_ENCRYPTION_KEY: ${HOMARR_SECRET_ENCRYPTION_KEY}
+
+    volumes:
+      # Optional: lets Homarr show container status. Remove if you don't want socket access.
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DATA_ROOT}/homarr:/appdata
+
+    ports:
+      - "${HOMARR_PORT:-7575}:7575"
+
+    networks:
+      - shared
+      - proxy
+
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.homarr.rule=Host(`${HOMARR_DOMAIN}`)
+    #   - traefik.http.routers.homarr.entrypoints=websecure
+    #   - traefik.http.routers.homarr.tls=true
+    #   - traefik.http.routers.homarr.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.homarr.loadbalancer.server.port=7575
+    #
+    #   - com.centurylinklabs.watchtower.enable=true
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
