@@ -1,0 +1,70 @@
+services:
+  infisical:
+    image: infisical/infisical:latest
+    container_name: infisical
+    restart: unless-stopped
+    env_file:
+      - ../../../.env
+    environment:
+      NODE_ENV: production
+      ENCRYPTION_KEY: ${INFISICAL_ENCRYPTION_KEY}
+      AUTH_SECRET: ${INFISICAL_AUTH_SECRET}
+      DB_CONNECTION_URI: postgres://${INFISICAL_DB_USER:-infisical}:${INFISICAL_DB_PASSWORD}@infisical-db:5432/${INFISICAL_DB_NAME:-infisical}
+      REDIS_URL: redis://infisical-redis:6379
+      SITE_URL: https://${INFISICAL_DOMAIN}
+    ports:
+      - "${INFISICAL_PORT:-8080}:8080"
+    depends_on:
+      infisical-db:
+        condition: service_healthy
+      infisical-redis:
+        condition: service_started
+    networks:
+      - shared
+      - proxy
+      - internal
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.infisical.rule=Host(`${INFISICAL_DOMAIN}`)
+    #   - traefik.http.routers.infisical.entrypoints=websecure
+    #   - traefik.http.routers.infisical.tls=true
+    #   - traefik.http.routers.infisical.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.infisical.loadbalancer.server.port=8080
+    #
+    #   - diun.enable=true
+
+  infisical-db:
+    image: postgres:16
+    container_name: infisical-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${INFISICAL_DB_USER:-infisical}
+      POSTGRES_PASSWORD: ${INFISICAL_DB_PASSWORD}
+      POSTGRES_DB: ${INFISICAL_DB_NAME:-infisical}
+    volumes:
+      - ${DATA_ROOT}/infisical/db:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${INFISICAL_DB_USER:-infisical}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  infisical-redis:
+    image: redis:7-alpine
+    container_name: infisical-redis
+    restart: unless-stopped
+    networks:
+      - internal
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
+  internal:
+    driver: bridge
+    internal: true
