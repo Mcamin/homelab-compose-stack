@@ -1,0 +1,31 @@
+services:
+  adminer:
+    image: adminer:latest
+    container_name: adminer
+    restart: unless-stopped
+    env_file:
+      - ../../../.env
+    environment:
+      TZ: ${TZ}
+      ADMINER_DEFAULT_SERVER: ${ADMINER_DEFAULT_SERVER:-mysql}
+    ports:
+      - "${ADMINER_PORT:-8080}:8080"
+    networks:
+      - shared
+      - proxy
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.adminer.rule=Host(`${ADMINER_DOMAIN}`)
+    #   - traefik.http.routers.adminer.entrypoints=websecure
+    #   - traefik.http.routers.adminer.tls=true
+    #   - traefik.http.routers.adminer.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.adminer.loadbalancer.server.port=8080
+    #
+    #   - diun.enable=true
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
