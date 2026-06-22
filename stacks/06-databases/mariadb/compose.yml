@@ -1,0 +1,28 @@
+services:
+  mariadb:
+    image: mariadb:11
+    container_name: mariadb
+    restart: unless-stopped
+    env_file:
+      - ../../../.env
+    environment:
+      TZ: ${TZ}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-app}
+      MARIADB_USER: ${MARIADB_USER:-app}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+    volumes:
+      - ${DATA_ROOT}/mariadb:/var/lib/mysql
+    # ports:
+    #   - "${MARIADB_PORT:-3306}:3306"
+    networks:
+      - shared
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
