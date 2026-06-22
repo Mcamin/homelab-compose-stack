@@ -13,6 +13,9 @@ services:
     volumes:
       - ${CONFIG_ROOT}/uptime-kuma:/app/data
 
+    ports:
+      - "${UPTIME_KUMA_PORT:-3001}:3001"
+
     networks:
       - shared
       - proxy
