@@ -1,0 +1,35 @@
+services:
+  tradenote:
+    image: eleventrading/tradenote:latest
+    container_name: tradenote
+    restart: unless-stopped
+    env_file:
+      - ../../../.env
+    environment:
+      TZ: ${TZ}
+      MONGO_URI: ${TRADENOTE_MONGO_URI}
+      TRADENOTE_DATABASE: ${TRADENOTE_DATABASE:-tradenote}
+      APP_ID: ${TRADENOTE_APP_ID}
+      MASTER_KEY: ${TRADENOTE_MASTER_KEY}
+      TRADENOTE_PORT: "8080"
+    ports:
+      - "${TRADENOTE_PORT:-8082}:8080"
+    networks:
+      - shared
+      - proxy
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.tradenote.rule=Host(`${TRADENOTE_DOMAIN}`)
+    #   - traefik.http.routers.tradenote.entrypoints=websecure
+    #   - traefik.http.routers.tradenote.tls=true
+    #   - traefik.http.routers.tradenote.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.tradenote.loadbalancer.server.port=8080
+    #
+    #   - diun.enable=true
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
