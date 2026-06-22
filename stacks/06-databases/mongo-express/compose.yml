@@ -1,0 +1,35 @@
+services:
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    restart: unless-stopped
+    env_file:
+      - ../../../.env
+    environment:
+      TZ: ${TZ}
+      ME_CONFIG_MONGODB_SERVER: ${ME_MONGODB_SERVER:-mongodb}
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USER:-root}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD}
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGOEXPRESS_USER:-admin}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGOEXPRESS_PASSWORD}
+    ports:
+      - "${MONGOEXPRESS_PORT:-8081}:8081"
+    networks:
+      - shared
+      - proxy
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.mongo-express.rule=Host(`${MONGOEXPRESS_DOMAIN}`)
+    #   - traefik.http.routers.mongo-express.entrypoints=websecure
+    #   - traefik.http.routers.mongo-express.tls=true
+    #   - traefik.http.routers.mongo-express.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.mongo-express.loadbalancer.server.port=8081
+    #
+    #   - diun.enable=true
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
