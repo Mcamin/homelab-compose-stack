@@ -1,0 +1,59 @@
+services:
+  gluetun:
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      TZ: ${TZ}
+      VPN_SERVICE_PROVIDER: ${GLUETUN_VPN_PROVIDER:-custom}
+      VPN_TYPE: ${GLUETUN_VPN_TYPE:-wireguard}
+      # WireGuard (most common). For OpenVPN/other providers see the gluetun wiki.
+      WIREGUARD_PRIVATE_KEY: ${GLUETUN_WIREGUARD_PRIVATE_KEY}
+      WIREGUARD_ADDRESSES: ${GLUETUN_WIREGUARD_ADDRESSES}
+      SERVER_COUNTRIES: ${GLUETUN_SERVER_COUNTRIES:-Netherlands}
+      # Allow your LAN to reach the published UIs below
+      FIREWALL_OUTBOUND_SUBNETS: ${GLUETUN_LAN_SUBNET:-192.168.1.0/24}
+
+    ports:
+      # ----------------------------------------------------------------
+      # gluetun owns the network namespace, so EVERY service that uses
+      # `network_mode: "container:gluetun"` publishes ITS web-UI port HERE.
+      # Uncomment the ports for the services you actually deploy.
+      # ----------------------------------------------------------------
+      # - "${QBITTORRENT_PORT:-8080}:8080"   # qBittorrent
+      # - "${NZBGET_PORT:-6789}:6789"        # NZBGet
+      # - "${SONARR_PORT:-8989}:8989"        # Sonarr
+      # - "${RADARR_PORT:-7878}:7878"        # Radarr
+      # - "${LIDARR_PORT:-8686}:8686"        # Lidarr
+      # - "${BAZARR_PORT:-6767}:6767"        # Bazarr
+      # - "${PROWLARR_PORT:-9696}:9696"      # Prowlarr
+      # - "${JACKETT_PORT:-9117}:9117"       # Jackett
+      # - "${FLARESOLVERR_PORT:-8191}:8191"  # FlareSolverr
+      # - "${SEERR_PORT:-5055}:5055"         # Seerr / Overseerr
+
+    networks:
+      - shared
+      - proxy
+
+    healthcheck:
+      test: ["CMD", "/gluetun-entrypoint", "healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
