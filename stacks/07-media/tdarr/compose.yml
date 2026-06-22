@@ -1,0 +1,57 @@
+services:
+  tdarr:
+    image: ghcr.io/haveagitgat/tdarr:latest
+    container_name: tdarr
+    restart: unless-stopped
+    env_file:
+      - ../../../.env
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      UMASK_SET: "002"
+      serverIP: 0.0.0.0
+      serverPort: "8266"
+      webUIPort: "8265"
+      internalNode: "true"
+      inContainer: "true"
+      nodeName: ${TDARR_NODE_NAME:-homelab}
+    volumes:
+      - ${CONFIG_ROOT}/tdarr/server:/app/server
+      - ${CONFIG_ROOT}/tdarr/configs:/app/configs
+      - ${CONFIG_ROOT}/tdarr/logs:/app/logs
+      - ${DATA_ROOT}/tdarr/temp:/temp
+      - ${MEDIA_ROOT}/movies:/media/movies
+      - ${MEDIA_ROOT}/tv:/media/tv
+    ports:
+      - "${TDARR_WEBUI_PORT:-8265}:8265"
+      - "${TDARR_SERVER_PORT:-8266}:8266"
+    networks:
+      - shared
+      - proxy
+    # ----------------------------
+    # NVIDIA GPU (optional). Needs the nvidia-container-toolkit on the host.
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    # ----------------------------
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.tdarr.rule=Host(`${TDARR_DOMAIN}`)
+    #   - traefik.http.routers.tdarr.entrypoints=websecure
+    #   - traefik.http.routers.tdarr.tls=true
+    #   - traefik.http.routers.tdarr.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.tdarr.loadbalancer.server.port=8265
+    #
+    #   - diun.enable=true
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
