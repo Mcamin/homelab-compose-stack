@@ -1,0 +1,39 @@
+services:
+  code-server:
+    image: lscr.io/linuxserver/code-server:latest
+    container_name: code-server
+    restart: unless-stopped
+    env_file:
+      - ../../../.env
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      PASSWORD: ${CODE_SERVER_PASSWORD}
+      SUDO_PASSWORD: ${CODE_SERVER_SUDO_PASSWORD}
+      PROXY_DOMAIN: ${CODE_SERVER_DOMAIN}
+      DEFAULT_WORKSPACE: /workspace
+    volumes:
+      - ${CONFIG_ROOT}/code-server:/config
+      - ${DATA_ROOT}/code-server/workspace:/workspace
+    ports:
+      - "${CODE_SERVER_PORT:-8443}:8443"
+    networks:
+      - shared
+      - proxy
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.code-server.rule=Host(`${CODE_SERVER_DOMAIN}`)
+    #   - traefik.http.routers.code-server.entrypoints=websecure
+    #   - traefik.http.routers.code-server.tls=true
+    #   - traefik.http.routers.code-server.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.code-server.loadbalancer.server.port=8443
+    #
+    #   - diun.enable=true
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
