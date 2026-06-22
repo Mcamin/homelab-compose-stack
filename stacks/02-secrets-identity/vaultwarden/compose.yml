@@ -1,0 +1,58 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      TZ: ${TZ}
+      # Public URL Vaultwarden is served on — REQUIRED for WebAuthn/2FA & attachments.
+      DOMAIN: https://${VAULTWARDEN_DOMAIN}
+      # Admin page token — CHANGE THIS. Generate: openssl rand -base64 48
+      ADMIN_TOKEN: ${VAULTWARDEN_ADMIN_TOKEN}
+      # Set to false once your accounts exist (stops open registration).
+      SIGNUPS_ALLOWED: ${VAULTWARDEN_SIGNUPS_ALLOWED:-false}
+
+    volumes:
+      - ${DATA_ROOT}/vaultwarden:/data
+
+    ports:
+      - "${VAULTWARDEN_PORT:-8081}:80"
+
+    networks:
+      - shared
+      - proxy
+
+    # ----------------------------
+    # Labels (optional) — expose via Traefik (recommended: only over HTTPS).
+    # ----------------------------
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.vaultwarden.rule=Host(`${VAULTWARDEN_DOMAIN}`)
+    #   - traefik.http.routers.vaultwarden.entrypoints=websecure
+    #   - traefik.http.routers.vaultwarden.tls=true
+    #   - traefik.http.routers.vaultwarden.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.vaultwarden.loadbalancer.server.port=80
+    #
+    #   - com.centurylinklabs.watchtower.enable=true
+
+    # ----------------------------
+    # Optional healthcheck
+    # ----------------------------
+    # healthcheck:
+    #   test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:80/alive || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 20s
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
