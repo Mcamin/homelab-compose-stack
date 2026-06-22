@@ -1,0 +1,54 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      JELLYFIN_PublishedServerUrl: https://${JELLYFIN_DOMAIN}
+
+    volumes:
+      - ${CONFIG_ROOT}/jellyfin:/config
+      - ${DATA_ROOT}/jellyfin/cache:/cache
+      - ${MEDIA_ROOT}/movies:/data/movies
+      - ${MEDIA_ROOT}/tv:/data/tv
+      - ${MEDIA_ROOT}/music:/data/music
+
+    ports:
+      - "${JELLYFIN_PORT:-8096}:8096"
+      - "7359:7359/udp"   # optional: client auto-discovery on the LAN
+
+    networks:
+      - shared
+      - proxy
+
+    # ----------------------------
+    # Hardware transcoding (optional). Uncomment for an Intel iGPU (QSV/VAAPI):
+    # devices:
+    #   - /dev/dri:/dev/dri
+    # For NVIDIA use the nvidia container runtime instead.
+    # ----------------------------
+
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.jellyfin.rule=Host(`${JELLYFIN_DOMAIN}`)
+    #   - traefik.http.routers.jellyfin.entrypoints=websecure
+    #   - traefik.http.routers.jellyfin.tls=true
+    #   - traefik.http.routers.jellyfin.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.jellyfin.loadbalancer.server.port=8096
+    #
+    #   - diun.enable=true
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
