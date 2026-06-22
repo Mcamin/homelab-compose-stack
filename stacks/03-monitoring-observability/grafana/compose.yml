@@ -1,0 +1,42 @@
+services:
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: grafana
+    restart: unless-stopped
+    user: "1000"
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      TZ: ${TZ}
+      GF_SERVER_ROOT_URL: https://${GRAFANA_DOMAIN}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+
+    volumes:
+      - ${DATA_ROOT}/grafana:/var/lib/grafana
+
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+
+    networks:
+      - shared
+      - proxy
+
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.grafana.rule=Host(`${GRAFANA_DOMAIN}`)
+    #   - traefik.http.routers.grafana.entrypoints=websecure
+    #   - traefik.http.routers.grafana.tls=true
+    #   - traefik.http.routers.grafana.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.grafana.loadbalancer.server.port=3000
+    #
+    #   - com.centurylinklabs.watchtower.enable=true
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
