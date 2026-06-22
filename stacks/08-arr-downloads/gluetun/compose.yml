@@ -38,6 +38,10 @@ services:
       # - "${JACKETT_PORT:-9117}:9117"       # Jackett
       # - "${FLARESOLVERR_PORT:-8191}:8191"  # FlareSolverr
       # - "${SEERR_PORT:-5055}:5055"         # Seerr / Overseerr
+      # - "${BINDERY_PORT:-8787}:8787"       # Bindery
+      # - "${OPENBOOKS_PORT:-8090}:80"       # OpenBooks
+      # - "${DISPATCHARR_PORT:-9191}:9191"   # Dispatcharr
+      # - "${CWA_PORT:-8083}:8083"           # Calibre-Web-Automated
 
     networks:
       - shared
