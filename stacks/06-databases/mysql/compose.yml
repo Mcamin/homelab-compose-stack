@@ -1,0 +1,28 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    restart: unless-stopped
+    env_file:
+      - ../../../.env
+    environment:
+      TZ: ${TZ}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-app}
+      MYSQL_USER: ${MYSQL_USER:-app}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ${DATA_ROOT}/mysql:/var/lib/mysql
+    # ports:
+    #   - "${MYSQL_PORT:-3306}:3306"
+    networks:
+      - shared
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
