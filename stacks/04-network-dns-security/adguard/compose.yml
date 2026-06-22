@@ -1,0 +1,60 @@
+services:
+  adguardhome:
+    image: adguard/adguardhome:latest
+    container_name: adguardhome
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      TZ: ${TZ}
+
+    volumes:
+      - ${CONFIG_ROOT}/adguardhome/conf:/opt/adguardhome/conf
+      - ${DATA_ROOT}/adguardhome/work:/opt/adguardhome/work
+
+    ports:
+      # DNS (the whole point) — your devices/router point here
+      - "53:53/tcp"
+      - "53:53/udp"
+      # First-run setup wizard ONLY — open http://<host>:3000 once, then it's unused
+      - "${ADGUARD_SETUP_PORT:-3000}:3000"
+      # Web UI / admin after setup (maps to the container's :80)
+      - "${ADGUARD_WEB_PORT:-8080}:80"
+
+    networks:
+      - shared
+      - proxy
+
+    # ----------------------------
+    # Labels (optional) — expose the admin UI via Traefik.
+    # Uncomment after the initial setup wizard is complete.
+    # ----------------------------
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.adguard.rule=Host(`${ADGUARD_DOMAIN}`)
+    #   - traefik.http.routers.adguard.entrypoints=websecure
+    #   - traefik.http.routers.adguard.tls=true
+    #   - traefik.http.routers.adguard.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.adguard.loadbalancer.server.port=80
+    #
+    #   - com.centurylinklabs.watchtower.enable=true
+
+    # ----------------------------
+    # Optional healthcheck
+    # ----------------------------
+    # healthcheck:
+    #   test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:80/ || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 20s
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
