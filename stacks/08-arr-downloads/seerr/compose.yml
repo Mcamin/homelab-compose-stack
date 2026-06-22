@@ -1,0 +1,22 @@
+services:
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    container_name: seerr
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      TZ: ${TZ}
+
+    volumes:
+      - ${CONFIG_ROOT}/seerr:/app/config
+
+    # VPN routing via the gluetun stack (start gluetun first; UI port is
+    # published on the gluetun stack; comment network_mode to skip the VPN;
+    # restart this container if gluetun is recreated).
+    network_mode: "container:gluetun"
+
+    # labels:
+    #   - diun.enable=true
