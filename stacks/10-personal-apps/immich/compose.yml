@@ -1,0 +1,87 @@
+services:
+  immich-server:
+    image: ghcr.io/immich-app/immich-server:release
+    container_name: immich-server
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      TZ: ${TZ}
+      DB_HOSTNAME: immich-db
+      DB_USERNAME: ${IMMICH_DB_USER:-immich}
+      DB_PASSWORD: ${IMMICH_DB_PASSWORD}
+      DB_DATABASE_NAME: ${IMMICH_DB_NAME:-immich}
+      REDIS_HOSTNAME: immich-redis
+
+    volumes:
+      - ${IMMICH_UPLOAD_LOCATION:?set IMMICH_UPLOAD_LOCATION}:/data
+      - /etc/localtime:/etc/localtime:ro
+
+    ports:
+      - "${IMMICH_PORT:-2283}:2283"
+
+    depends_on:
+      - immich-redis
+      - immich-db
+
+    networks:
+      - shared
+      - proxy
+      - internal
+
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.immich.rule=Host(`${IMMICH_DOMAIN}`)
+    #   - traefik.http.routers.immich.entrypoints=websecure
+    #   - traefik.http.routers.immich.tls=true
+    #   - traefik.http.routers.immich.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.immich.loadbalancer.server.port=2283
+    #
+    #   - diun.enable=true
+
+  immich-machine-learning:
+    image: ghcr.io/immich-app/immich-machine-learning:release
+    container_name: immich-machine-learning
+    restart: unless-stopped
+    env_file:
+      - ../../../.env
+    volumes:
+      - ${DATA_ROOT}/immich/model-cache:/cache
+    networks:
+      - internal
+
+  immich-redis:
+    image: docker.io/valkey/valkey:8-bookworm
+    container_name: immich-redis
+    restart: unless-stopped
+    networks:
+      - internal
+
+  immich-db:
+    # Immich ships its own Postgres image (pgvector). Check the immich release notes
+    # for the exact tag matching your server version before upgrading.
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.3.0
+    container_name: immich-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${IMMICH_DB_USER:-immich}
+      POSTGRES_PASSWORD: ${IMMICH_DB_PASSWORD}
+      POSTGRES_DB: ${IMMICH_DB_NAME:-immich}
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+    volumes:
+      - ${DATA_ROOT}/immich/db:/var/lib/postgresql/data
+    networks:
+      - internal
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
+  internal:
+    driver: bridge
+    internal: true
