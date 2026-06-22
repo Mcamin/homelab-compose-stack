@@ -1,0 +1,31 @@
+services:
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      WEBUI_PORT: ${QBITTORRENT_PORT:-8080}
+
+    volumes:
+      - ${CONFIG_ROOT}/qbittorrent:/config
+      - ${DOWNLOADS_ROOT}:/downloads
+
+    # ----------------------------------------------------------------
+    # VPN routing via the gluetun stack (08-arr-downloads/gluetun).
+    # - Start gluetun FIRST; this won't start without it.
+    # - This service's web UI is published on the GLUETUN stack, not here.
+    # - To run WITHOUT the VPN: comment network_mode and add your own
+    #   ports: + networks: (shared/proxy) instead.
+    # - If gluetun is recreated, restart this container.
+    # ----------------------------------------------------------------
+    network_mode: "container:gluetun"
+
+    # labels:
+    #   - diun.enable=true   # opt in to Diun update notifications
