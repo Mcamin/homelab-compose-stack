@@ -1,0 +1,103 @@
+services:
+  nextcloud:
+    image: nextcloud:latest
+    container_name: nextcloud
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      TZ: ${TZ}
+      MYSQL_HOST: nextcloud-db
+      MYSQL_DATABASE: ${NEXTCLOUD_DB_NAME:-nextcloud}
+      MYSQL_USER: ${NEXTCLOUD_DB_USER:-nextcloud}
+      MYSQL_PASSWORD: ${NEXTCLOUD_DB_PASSWORD}
+      REDIS_HOST: nextcloud-redis
+      NEXTCLOUD_ADMIN_USER: ${NEXTCLOUD_ADMIN_USER:-admin}
+      NEXTCLOUD_ADMIN_PASSWORD: ${NEXTCLOUD_ADMIN_PASSWORD}
+      NEXTCLOUD_TRUSTED_DOMAINS: ${NEXTCLOUD_DOMAIN}
+
+    volumes:
+      - ${DATA_ROOT}/nextcloud/html:/var/www/html
+
+    ports:
+      - "${NEXTCLOUD_PORT:-8080}:80"
+
+    depends_on:
+      nextcloud-db:
+        condition: service_healthy
+      nextcloud-redis:
+        condition: service_started
+
+    networks:
+      - shared
+      - proxy
+      - internal
+
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.nextcloud.rule=Host(`${NEXTCLOUD_DOMAIN}`)
+    #   - traefik.http.routers.nextcloud.entrypoints=websecure
+    #   - traefik.http.routers.nextcloud.tls=true
+    #   - traefik.http.routers.nextcloud.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.nextcloud.loadbalancer.server.port=80
+    #
+    #   - diun.enable=true
+
+  nextcloud-cron:
+    image: nextcloud:latest
+    container_name: nextcloud-cron
+    restart: unless-stopped
+    entrypoint: /cron.sh
+    env_file:
+      - ../../../.env
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - ${DATA_ROOT}/nextcloud/html:/var/www/html
+    depends_on:
+      - nextcloud
+    networks:
+      - internal
+
+  nextcloud-db:
+    image: mariadb:11
+    container_name: nextcloud-db
+    restart: unless-stopped
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    env_file:
+      - ../../../.env
+    environment:
+      MARIADB_DATABASE: ${NEXTCLOUD_DB_NAME:-nextcloud}
+      MARIADB_USER: ${NEXTCLOUD_DB_USER:-nextcloud}
+      MARIADB_PASSWORD: ${NEXTCLOUD_DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${NEXTCLOUD_DB_ROOT_PASSWORD}
+    volumes:
+      - ${DATA_ROOT}/nextcloud/db:/var/lib/mysql
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  nextcloud-redis:
+    image: redis:alpine
+    container_name: nextcloud-redis
+    restart: unless-stopped
+    networks:
+      - internal
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
+  internal:
+    driver: bridge
+    internal: true
