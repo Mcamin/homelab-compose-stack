@@ -1,0 +1,31 @@
+services:
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+
+    volumes:
+      - ${CONFIG_ROOT}/bazarr:/config
+      - ${MEDIA_ROOT}/tv:/tv
+      - ${MEDIA_ROOT}/movies:/movies
+
+    # ----------------------------------------------------------------
+    # VPN routing via the gluetun stack (08-arr-downloads/gluetun).
+    # - Start gluetun FIRST; this won't start without it.
+    # - This service's web UI is published on the GLUETUN stack, not here.
+    # - To run WITHOUT the VPN: comment network_mode and add your own
+    #   ports: + networks: (shared/proxy) instead.
+    # - If gluetun is recreated, restart this container.
+    # ----------------------------------------------------------------
+    network_mode: "container:gluetun"
+
+    # labels:
+    #   - diun.enable=true   # opt in to Diun update notifications
