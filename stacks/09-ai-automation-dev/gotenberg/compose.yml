@@ -1,0 +1,43 @@
+services:
+  gotenberg:
+    image: gotenberg/gotenberg:latest
+    container_name: gotenberg
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      TZ: ${TZ}
+
+    ports:
+      - "${GOTENBERG_PORT:-3000}:3000"
+
+    networks:
+      - shared
+      - proxy
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.gotenberg.rule=Host(`${GOTENBERG_DOMAIN}`)
+    #   - traefik.http.routers.gotenberg.entrypoints=websecure
+    #   - traefik.http.routers.gotenberg.tls=true
+    #   - traefik.http.routers.gotenberg.tls.certresolver=${TRAEFIK_CERTRESOLVER}
+    #   - traefik.http.services.gotenberg.loadbalancer.server.port=3000
+    #
+    #   - diun.enable=true
+
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK}
