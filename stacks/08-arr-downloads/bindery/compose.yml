@@ -1,0 +1,26 @@
+services:
+  bindery:
+    image: ghcr.io/vavallee/bindery:latest
+    container_name: bindery
+    restart: unless-stopped
+
+    env_file:
+      - ../../../.env
+
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+
+    volumes:
+      - ${CONFIG_ROOT}/bindery:/config
+      - ${MEDIA_ROOT}/books:/books
+      - ${DOWNLOADS_ROOT}:/downloads
+
+    # VPN routing via the gluetun stack (start gluetun first; UI port is
+    # published on the gluetun stack; comment network_mode to skip the VPN;
+    # restart this container if gluetun is recreated).
+    network_mode: "container:gluetun"
+
+    # labels:
+    #   - diun.enable=true
