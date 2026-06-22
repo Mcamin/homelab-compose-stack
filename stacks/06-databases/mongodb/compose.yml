@@ -1,0 +1,21 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    restart: unless-stopped
+    env_file:
+      - ../../../.env
+    environment:
+      TZ: ${TZ}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    volumes:
+      - ${DATA_ROOT}/mongodb:/data/db
+    # ports:
+    #   - "${MONGO_PORT:-27017}:27017"
+    networks:
+      - shared
+networks:
+  shared:
+    external: true
+    name: ${SHARED_NETWORK}
