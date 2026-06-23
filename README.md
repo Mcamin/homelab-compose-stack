@@ -1,4 +1,4 @@
-# 🏠 Homelab Compose Stack
+# Homelab Compose Stack
 
 Modular, reproducible **Docker Compose infrastructure** for self-hosted environments.
 
@@ -6,7 +6,7 @@ Designed to scale from a small setup to a fully structured homelab with clean se
 
 ---
 
-## ✨ Overview
+## Overview
 
 This repository provides a **structured approach to managing self-hosted services** using Docker Compose.
 
@@ -19,7 +19,7 @@ Instead of maintaining large monolithic compose files, services are:
 
 ---
 
-## 🧠 Design Principles
+## Design Principles
 
 * **Modularity first** — one service per stack
 * **No hardcoded values** — everything configurable via environment variables
@@ -29,7 +29,7 @@ Instead of maintaining large monolithic compose files, services are:
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 homelab-compose-stack/
@@ -42,7 +42,7 @@ homelab-compose-stack/
 
 ---
 
-## 🚀 What This Enables
+## What This Enables
 
 * Rapid deployment of new services
 * Consistent configuration across stacks
@@ -51,7 +51,7 @@ homelab-compose-stack/
 
 ---
 
-## 📦 Example Services
+## Example Services
 
 This stack is designed to support common homelab services such as:
 
@@ -62,7 +62,7 @@ This stack is designed to support common homelab services such as:
 
 ---
 
-## 🔧 Tech Stack
+## Tech Stack
 
 * Docker / Docker Compose
 * Linux-based environments
@@ -70,19 +70,19 @@ This stack is designed to support common homelab services such as:
 
 ---
 
-## 📌 Status
+## Status
 
 Actively evolving — focused on building a clean, scalable foundation for long-term homelab management.
 
 ---
 
-## ⚡ Philosophy
+## Philosophy
 
 > Infrastructure should be **predictable, reproducible, and easy to extend**.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 This repository is primarily for personal infrastructure,
 but ideas, improvements, and discussions are always welcome.
